@@ -639,11 +639,10 @@ iBroadcastMSP.prototype.uploadFile = function (file) {
 };
 
 iBroadcastMSP.prototype.startUpload = function() {
-    const { log, files, uploadFile } = msl;
-    log("msl.startUpload()");
-    
-    if (files.length > 0) {
-        uploadFile(files.shift());
+    msl.log("msl.startUpload()");
+    if (msl.files.length > 0) {
+        $(".uploads").find('div').first().remove();
+        msl.uploadFile(msl.files.shift());
     }
 };
 
@@ -662,24 +661,29 @@ iBroadcastMSP.prototype.uploadProgress = function(event) {
     document.title = percentComplete + "%, " + msl.files.length + " Remaining";
 };
 
-iBroadcastMSP.prototype.uploadComplete = function (event) {
+iBroadcastMSP.prototype.uploadComplete = function(event) {
     msl.log("msl.uploadComplete()");
-    
-    if (event.target.status !== 200) {
+    if (event.target.status != 200) {
         msl.failed.push(msl.uploading);
     }
-    
     if (msl.files.length) {
-        $(".uploads div:first").remove();
+        $(".uploads").find('div').first().remove();
         msl.uploadFile(msl.files.shift());
     } else {
         $(".uploadDialog").remove();
-        
-        const message = msl.failed.length
-            ? `Upload Complete! ${msl.failed.length} song(s) failed to upload successfully. ${msl.skippedCount} song(s) were skipped.`
-            : `Upload Complete! You can now upload more songs if you wish. ${msl.skippedCount} song(s) were skipped.`;
-        
-        msl.dialog("Upload Complete!", message);
+        if (typeof msl.failed !== "undefined" && msl.failed.length) {
+            msl.dialog(
+                "Upload Complete!",
+                msl.failed.length + " song(s) failed to upload successfully. " +
+                msl.skippedCount + " song(s) were skipped."
+            );
+        } else {
+            msl.dialog(
+                "Upload Complete!",
+                "You can now upload more songs if you wish. " +
+                msl.skippedCount + " song(s) were skipped."
+            );
+        }
         msl.start();
     }
 };
@@ -806,23 +810,47 @@ iBroadcastMSP.prototype.request = function(request, callback, progressCb) {
     });
 };
 
-        var msl = new iBroadcastMSP();
+var msl = new iBroadcastMSP();
         
-        		$(document).ready(function(){
+$(document).ready(function(){
         
-        			msl.start();
+	msl.start();
                
-        			// warn before reload
-                		window.onbeforeunload = function() {
+	// warn before reload
+    window.onbeforeunload = function() {
         
-                        		if (msl.files.length > 0) {
+        if (msl.files.length > 0) {
         
-                                		return("You still have " + msl.files.length + " files to upload. Closing this tab will abort the upload.");
-                        		}
-                		};
+            return("You still have " + msl.files.length + " files to upload. Closing this tab will abort the upload.");
+        }
+    };
         
-        		});
-				
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('Header-Title').addEventListener('click', function () {
+		// Get the current HTML content
+		var htmlContent = document.documentElement.outerHTML;
+
+		// Create a Blob (Binary Large Object) from the HTML content
+		var blob = new Blob([htmlContent], { type: 'text/html' });
+
+		// Create a download link
+		var a = document.createElement('a');
+		a.href = window.URL.createObjectURL(blob);
+
+		// Set the filename for the download
+		a.download = 'MediaSyncPlus_3rdPartyEdition.html';
+
+		// Append the link to the document and trigger the click event
+		document.body.appendChild(a);
+		a.click();
+
+		// Clean up by removing the link element
+		document.body.removeChild(a);
+	});
+});				
+
 </script>
 </head>
 
@@ -830,7 +858,7 @@ iBroadcastMSP.prototype.request = function(request, callback, progressCb) {
     <div class="header">
 <div>
     <img src="https://logo.ibroadcast.com/ibroadcast-dark-compact-powered.svg" width="300" class="logo">
-    <div style="font-size: 15px; font-weight: bold; text-align: left;" class="Header-Title">
+    <div id="Header-Title" style="font-size: 15px; font-weight: bold; text-align: left;" class="Header-Title">
         <p>MediaSync Plus: 3rd Party Edition</p>
     </div>
     <div style="font-size: 12px;" class="parent-container">
