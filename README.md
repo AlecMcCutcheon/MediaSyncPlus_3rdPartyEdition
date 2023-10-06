@@ -1,5 +1,5 @@
 # MediaSync Plus: 3rd Party Edition
-Built upon the excellent foundation of MediaSync Lite, MediaSync Plus is a Standalone Version with Additional features like:
+Built upon the excellent foundation of MediaSync Lite, MediaSync Plus is a revised version with Additional features like:
 
   - Skips duplicate songs in your library.
   - A new Lights Out theme.
